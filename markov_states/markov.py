@@ -35,9 +35,11 @@ def largest_change(l1, l2):
 	return change
 
 population, matrix, steps, numstates = input_reader()
-print 'Transition rates: \n', matrix
 print 'Starting state: \n', population
+print 'Transition rates: \n', matrix
 step = 0
+print 'Populations | largest delta'
+print population
 while step < steps:
 #	print "Step {0}...".format(step)
 	newpop = np.zeros([numstates])
