@@ -1,6 +1,7 @@
 #Reads the number of states, transition matrix, initial populations, and number of timesteps from input.txt, then evolves the system over time for the set number of timesteps
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 def input_reader():
 	with open('input.txt', 'r') as infile:
@@ -40,6 +41,8 @@ print 'Transition rates: \n', matrix
 step = 0
 print 'Populations | largest delta'
 print population
+results = []
+results = population
 while step < steps:
 #	print "Step {0}...".format(step)
 	newpop = np.zeros([numstates])
@@ -54,5 +57,12 @@ while step < steps:
 	if biggest_change < 10e-7:
 		print 'Equilibirum'
 		step = steps
+	results = np.vstack([results, newpop])
 	population = newpop
 	step += 1
+print results.T
+for item in results.T:
+	plt.plot(range(len(item)), item)
+plt.ylim([0,1])
+plt.legend()
+plt.show()
