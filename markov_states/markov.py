@@ -1,7 +1,9 @@
 #Reads the number of states, transition matrix, initial populations, and number of timesteps from input.txt, then evolves the system over time for the set number of timesteps
 
 import numpy as np
+np.warnings.filterwarnings('ignore')
 import matplotlib.pyplot as plt
+import scipy.linalg as la
 
 def input_reader():
 	with open('input.txt', 'r') as infile:
@@ -19,13 +21,20 @@ def input_reader():
 				for i in range (numstates):
 					num = float(line.split()[i])
 					matrix[linecounter-3][i] = num
+				matrix[linecounter-3] = normalize(matrix[linecounter-3])
 			linecounter += 1
 		line = lines[linecounter]
 		for i in range (numstates):
 			num = float(line.split()[i])
 			population[i] = num
+		population = normalize(population)
 		steps = int(lines[linecounter+2])
 		return population, matrix, steps, numstates
+
+def normalize(vector):
+	total = sum(vector)
+	outvec = [q*(1/float(total)) for q in vector]
+	return outvec
 
 def largest_change(l1, l2):
 	change = 0	
@@ -35,9 +44,27 @@ def largest_change(l1, l2):
 			change = delta
 	return change
 
+def onefinder(vals):
+	dim = len(vals)
+	for q in range (dim):
+		if np.isclose(1, vals[q]):
+			return q
+	print "Couldn't find 1 eigenvalue"
+
 population, matrix, steps, numstates = input_reader()
 print 'Starting state: \n', population
 print 'Transition rates: \n', matrix
+matrix = np.array(matrix)
+vals, vecs = np.linalg.eig(matrix.T)
+vecs = vecs.T
+#print 'evals: ', vals
+#print 'evecs: \n', vecs
+onelocation = onefinder(vals)
+eqvec = vecs[onelocation]
+print 'Equilibrium populations: ', np.real(normalize(eqvec))
+#for vec in vecs:
+#	print 'vec: ', vec, 'normalized: ', normalize(vec), 'vec/sum', vec/vec.sum()
+#	print normalize(vec)
 step = 0
 print 'Populations | largest delta'
 print population
@@ -60,9 +87,13 @@ while step < steps:
 	results = np.vstack([results, newpop])
 	population = newpop
 	step += 1
-print results.T
-for item in results.T:
-	plt.plot(range(len(item)), item)
+dim = len(results.T)
+for q in range (dim):
+#for item in results.T:
+	item = results.T[q]
+	plt.plot(range(len(item)), item, label = "State # {0}".format(q))
+plt.xlabel('Timestep')
+plt.ylabel('Population')
 plt.ylim([0,1])
 plt.legend()
 plt.show()
