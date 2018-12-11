@@ -4,6 +4,7 @@ import numpy as np
 np.warnings.filterwarnings('ignore')
 import matplotlib.pyplot as plt
 import scipy.linalg as la
+from random import random
 
 def input_reader():
 	with open('input.txt', 'r') as infile:
@@ -60,8 +61,8 @@ vecs = vecs.T
 #print 'evals: ', vals
 #print 'evecs: \n', vecs
 onelocation = onefinder(vals)
-eqvec = vecs[onelocation]
-print 'Equilibrium populations: ', np.real(normalize(eqvec))
+eqvec = np.real(normalize(vecs[onelocation]))
+print 'Equilibrium populations: ', eqvec
 #for vec in vecs:
 #	print 'vec: ', vec, 'normalized: ', normalize(vec), 'vec/sum', vec/vec.sum()
 #	print normalize(vec)
@@ -94,6 +95,8 @@ for q in range (dim):
 	plt.plot(range(len(item)), item, label = "State # {0}".format(q))
 plt.xlabel('Timestep')
 plt.ylabel('Population')
-plt.ylim([0,1])
+#plt.ylim([0,1])
 plt.legend()
+print 'Prediction equilibrium populations are close? '
+print np.isclose(eqvec, population)
 plt.show()
